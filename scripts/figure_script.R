@@ -432,10 +432,10 @@ ggsave(fig2, filename = paste( "../figures/Fig_2.png",sep = ""), units = "mm",he
 #          MA lines                      #
 ##########################################
 
-table_s3 <- data.table::fread("../processed_data/MA_pSTRs_mutationRate.tsv") 
+data_fig_3 <- data.table::fread("../processed_data/MA_pSTRs_mutationRate.tsv") 
 
 
-fig_3_t <- ggplot(subset(table_s3, motif_length=="Motif sizes 1-6"),aes(x=mutation,y=mutation_rate))+
+fig_3_t <- ggplot(subset(data_fig_3, motif_length=="Motif sizes 1-6"),aes(x=mutation,y=mutation_rate))+
   geom_jitter( shape=20,position=position_jitter(0.4), size=1, alpha=0.8,color="gray69") +
   geom_boxplot(outlier.shape = NA,fill=NA ,aes(color=mutation)) +
   facet_grid(motif_length~comparison ,scales = "free") +
@@ -453,7 +453,7 @@ fig_3_t <- ggplot(subset(table_s3, motif_length=="Motif sizes 1-6"),aes(x=mutati
                               method = "wilcox.test")
 
 
-fig_3_m <- ggplot(subset(table_s3, motif_length==1),aes(x=mutation,y=mutation_rate))+
+fig_3_m <- ggplot(subset(data_fig_3, motif_length==1),aes(x=mutation,y=mutation_rate))+
   geom_jitter( shape=20,position=position_jitter(0.4), size=1, alpha=0.8,color="gray69") +
   geom_boxplot(outlier.shape = NA,fill=NA ,aes(color=mutation)) +
   facet_grid(motif_length~comparison ,scales = "free") +
@@ -471,7 +471,7 @@ fig_3_m <- ggplot(subset(table_s3, motif_length==1),aes(x=mutation,y=mutation_ra
                               method = "wilcox.test")
 
 
-fig_3_b <- ggplot(subset(table_s3, motif_length==2),aes(x=mutation,y=mutation_rate))+
+fig_3_b <- ggplot(subset(data_fig_3, motif_length==2),aes(x=mutation,y=mutation_rate))+
   geom_jitter( shape=20,position=position_jitter(0.4), size=1, alpha=0.8,color="gray69") +
   geom_boxplot(outlier.shape = NA,fill=NA ,aes(color=mutation)) +
   facet_grid(motif_length~comparison ,scales = "free") +
@@ -1354,12 +1354,12 @@ ggsave(fig_S4, filename = paste( "../figures/Supp_fig4_frac_expansion.png",sep =
 #          MA_pSTR motif enrichment       #
 ##########################################
 
-table_s2 <- data.table::fread("../processed_data/MA_pSTRs.tsv")
+data_fig_s5 <- data.table::fread("../processed_data/MA_pSTRs.tsv")
 
 ###### fig_S5a  ######
  
 
-MAstr_motif_count  <- table_s2 %>% 
+MAstr_motif_count  <- data_fig_s5 %>% 
   dplyr::group_by(motif_geno,motif_length) %>% 
   dplyr::count() %>% 
   dplyr::ungroup() %>% 
@@ -1381,7 +1381,7 @@ fig_S5a <- ggplot(MAstr_motif_count,aes(x=motif,y=n ,fill=factor(motif_length)))
 
 ###### fig_S5b ######
 
-MASTR_region <- table_s2  %>% 
+MASTR_region <- data_fig_s5  %>% 
   dplyr::group_by(gfeature,motif_length) %>% 
   dplyr::add_count(name = "STRbyPS_REGION")%>% 
   dplyr::group_by(gfeature) %>% 
@@ -1443,7 +1443,7 @@ fig_S5c <- ggplot(enrich_MASTR_region,
 ###### fig_S5d ######
 
 
-enrichMotif_MASTR_region <-  table_s2 %>% 
+enrichMotif_MASTR_region <-  data_fig_s5 %>% 
   dplyr::group_by(gfeature, motif_geno) %>% 
   dplyr::count(name = "sig_n") %>% 
   dplyr::ungroup() %>% 
@@ -1665,9 +1665,17 @@ ggsave(figS6, filename = paste( "../figures/Supp_fig6_constrainedCDS.png",sep = 
 
 str_exp_pxg <- data.table::fread("../processed_data/str_exp_pxg.tsv")
 
+list2 <- str_exp_pxg %>% 
+  dplyr::filter(pSTR %in% c("STR_13795", "STR_13083" )) %>% 
+  dplyr::distinct(pSTR,transcript) %>% 
+  dplyr::group_by(transcript) %>% 
+  dplyr::count() %>% 
+  dplyr::filter(n>1)
+
 data_fig_S8 <- str_exp_pxg %>% 
-  dplyr::filter(pSTR=="STR_13795")%>% 
-  dplyr::mutate(transcript = paste(ext_gene, transcript, sep="\n"))
+  dplyr::filter(pSTR=="STR_13795") %>% 
+  dplyr::mutate(overlap=ifelse(transcript %in% list2$transcript,"yes","no")) %>% 
+  dplyr::mutate(transcript = paste(ext_gene, transcript, sep="\n")) 
 
 data_fig_S8$genotype2<- factor(data_fig_S8$genotype,levels = unique(data_fig_S8$genotype))
 
@@ -1683,32 +1691,33 @@ fig_S8a <- ggplot(subset(data_fig_S8,ext_gene=="cls-2"),aes(x=as.factor(genotype
   facet_grid(.~transcript ,scales = "free") 
 
 fig_S8b <- ggplot(subset(data_fig_S8,ext_gene!="cls-2"),aes(x=as.factor(genotype2),y=expression ))+
-  geom_jitter(shape=21,position=position_jitter(0.2),aes(fill=STRallele) ) +
-  geom_boxplot( outlier.shape = NA,alpha=0.5) +
+  geom_jitter(position=position_jitter(0.2),aes(fill=STRallele) ,shape=21) +
+  geom_boxplot( outlier.shape = NA,alpha=0.5,aes(color=overlap)) +
   theme_cust+
-  theme(strip.text = ggplot2::element_text(size=12, vjust = 1,  color = "black",face = "italic"),
-        legend.position = "none")+
-  ggplot2::scale_fill_manual(values = c("REF"="orange","ALT"="blue"  ) )+
+  theme(strip.text = ggplot2::element_text(size=11, vjust = 1,  color = "black",face = "italic"),
+        legend.position = "none") +
+  ggplot2::scale_fill_manual(values = c("REF"="orange","ALT"="blue"  ) ) +
+  ggplot2::scale_color_manual(values = c("yes"="red","no"="black"  ) ) +
   xlab(paste("Length of STR_13795" )) + 
   ylab("Expression") +  
   facet_wrap(.~transcript ,scales = "free",nrow=2) 
 
 
 fig_S8a2 <- cowplot::plot_grid(fig_S8a,  NULL,  
-                              label_size = 12, 
-                              label_fontfamily="Helvetica",
-                              nrow = 1)
+                               label_size = 12, 
+                               label_fontfamily="Helvetica",
+                               nrow = 1)
 
 
 
 
 fig_S8  <- cowplot::plot_grid(fig_S8a2,fig_S8b,
-                                   labels = c('A', 'B' ), 
-                                   label_size = 12, 
-                                   label_fontfamily="Helvetica",
-                                   rel_heights = c(0.5,1),
-                                   axis = "lr",
-                                   nrow = 2)
+                              labels = c('A', 'B' ), 
+                              label_size = 12, 
+                              label_fontfamily="Helvetica",
+                              rel_heights = c(0.5,1),
+                              axis = "lr",
+                              nrow = 2)
 
 
 ggsave(fig_S8, filename = paste("../figures/supp_fig8_STR13795.png",sep = ""), units = "mm",height = 160, width = 170)
@@ -1721,28 +1730,31 @@ ggsave(fig_S8, filename = paste("../figures/supp_fig8_STR13795.png",sep = ""), u
 
 data_fig_S9 <- str_exp_pxg %>% 
   dplyr::filter(pSTR=="STR_13083")%>% 
+  dplyr::mutate(overlap=ifelse(transcript %in% list2$transcript,"yes","no"))%>% 
   dplyr::mutate(transcript = paste(ext_gene, transcript, sep="\n"))
 
 data_fig_S9$genotype2<- factor(data_fig_S9$genotype,levels = unique(data_fig_S9$genotype))
 
 fig_S9a <- ggplot(subset(data_fig_S9,ext_gene=="polq-1"),aes(x=as.factor(genotype2),y=expression ))+
-  geom_jitter(shape=21,position=position_jitter(0.2),aes(fill=STRallele) ) +
-  geom_boxplot( outlier.shape = NA,alpha=0.5) +
+  geom_jitter( position=position_jitter(0.2),aes(fill=STRallele) ,shape=21 ) +
+  geom_boxplot( outlier.shape = NA,alpha=0.5,aes(color=overlap)) +
   theme_cust+
   theme(strip.text = ggplot2::element_text(size=12, vjust = 1,  color = "black",face = "italic"),
         legend.position = "none")+
   ggplot2::scale_fill_manual(values = c("REF"="orange","ALT"="blue"  ) )+
+  ggplot2::scale_color_manual(values = c("yes"="red","no"="black"  ) ) +
   xlab(paste("Length of STR_13083" )) + 
   ylab("Expression") +  
   facet_grid(.~transcript ,scales = "free") 
 
 fig_S9b <- ggplot(subset(data_fig_S9,ext_gene!="polq-1"),aes(x=as.factor(genotype2),y=expression ))+
-  geom_jitter(shape=21,position=position_jitter(0.2),aes(fill=STRallele) ) +
-  geom_boxplot( outlier.shape = NA,alpha=0.5) +
+  geom_jitter( position=position_jitter(0.2),aes(fill=STRallele )  ,shape=21) +
+  geom_boxplot( outlier.shape = NA,alpha=0.5,aes(color=overlap)) +
   theme_cust+
-  theme(strip.text = ggplot2::element_text(size=12, vjust = 1,  color = "black",face = "italic"),
+  theme(strip.text = ggplot2::element_text(size=11, vjust = 1,  color = "black",face = "italic"),
         legend.position = "none")+
   ggplot2::scale_fill_manual(values = c("REF"="orange","ALT"="blue"  ) )+
+  ggplot2::scale_color_manual(values = c("yes"="red","no"="black"  ) ) +
   xlab(paste("Length of STR_13083" )) + 
   ylab("Expression") +  
   facet_wrap(.~transcript ,scales = "free",nrow=2) 
