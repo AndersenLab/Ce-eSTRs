@@ -960,7 +960,7 @@ fig_5d <- ggplot() +
 top_mediators_cor <- data.table::fread("../processed_data/STR_mutation_trait_mediators_cor.tsv") %>% 
   dplyr::mutate(transcript=paste(ext_gene,"\n",transcript))%>% 
   dplyr::left_join(strain_ALT_frac, by=c("strain"="isotype"))%>% 
-  dplyr::mutate(pp="p",ppp="r")
+  dplyr::mutate(pp="p ",ppp="r ")
 
 top_mediators_cor$transcript2 <- factor(  top_mediators_cor$transcript, levels = c("F59E12.15 \n F59E12.15.1", "F59E12.15 \n F59E12.15.2","ctl-1 \n Y54G11A.6.1","ctl-1 \n Y54G11A.6.2") )
 
@@ -977,9 +977,8 @@ fig_5e <- ggplot(top_mediators_cor,aes(y=Total_mutation,x=exp,color= sweep))+
   ylab("STR variation")+
   ggplot2::theme( strip.text.x = ggplot2::element_text(size=12, vjust = 1,  color = "black",face = "italic"),
                   strip.text.y = element_blank(), panel.spacing = unit(1,"line")) +
-  geom_text(data= subset(top_mediators_cor, strain=="AB1"), aes(label = paste0(": ",pearson_cor), x= 3.8, y=33 ),color="gray6" )+ 
- # geom_text(data= subset(top_mediators_cor, strain=="AB1"), aes(label =  pearson_cor, x=3.4, y=33 ),color="gray6" )+ 
-  geom_text(data= subset(top_mediators_cor, strain=="AB1" ), aes(label = paste0(": ",pvalue ), x=4, y=25  ),color="gray6" )+ 
+  geom_text(data= subset(top_mediators_cor, strain=="AB1"), aes(label = paste0(" : ",pearson_cor), x= 3.8, y=33 ),color="gray6" )+ 
+  geom_text(data= subset(top_mediators_cor, strain=="AB1" ), aes(label = paste0(" : ",pvalue ), x=4, y=25  ),color="gray6" )+ 
   geom_text(data= subset(top_mediators_cor, strain=="AB1" ), aes(label = pp, x=2.2, y=25 ,fontface=3 ),color="gray6"  )+
   geom_text(data= subset(top_mediators_cor, strain=="AB1" ), aes(label = ppp, x=2.2, y=33 ,fontface=3 ),color="gray6"  )+
   scale_x_continuous(breaks=c(-1,1,3,5 )  )
@@ -1165,7 +1164,8 @@ fig_8a <- ggplot(data_fig_8a,aes(x=eQTL_var_exp,y=STR_var_exp,color=factor(nSTR_
   scale_color_manual(values=c("mediumpurple4","#D55E00", "burlywood3", "#0072B2","#009E73"))
 
 ###### fig_8b ######
-data_fig_8b <- data.table::fread("../processed_data/Lrt_hotspot_eSTRs.tsv")
+data_fig_8b <- data.table::fread("../processed_data/Lrt_hotspot_eSTRs.tsv") %>% 
+  dplyr::filter(n_med_STR>4)
 
 
 hotspot_pos <- data_fig_8b %>% 
@@ -1185,7 +1185,7 @@ fig_8b <- ggplot() +
   theme(legend.position = "none",
         axis.text.x = element_blank(),
         panel.spacing = unit(0.1,"line") )+
-  scale_y_continuous( name = "Percentile of\ndistant eQTL", sec.axis = sec_axis( trans=~.*3, name="Total number of\ndistant eQTL\nin each hotspot"), expand = c(0, 0),   limits = c(0,70) ) +
+  scale_y_continuous( name = "Percentage of\ndistant eQTL (%)", sec.axis = sec_axis( trans=~.*3, name="Total number of\ndistant eQTL\nin each hotspot"), expand = c(0, 0),   limits = c(0,70) ) +
   scale_x_continuous(expand = c(0, 0) ) 
 
 
