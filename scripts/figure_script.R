@@ -115,7 +115,7 @@ fig_1c <- ggplot(PolySTR_region,aes(x=gfeatures,y=ps2region,fill=factor(motif_le
   coord_flip() +
   theme_cust +
   xlab("Genomic features")+
-  ylab("Percentage of pSTRs (%)")  +
+  ylab("Percent of pSTRs (%)")  +
   labs(fill="Motif\nlength")+
   scale_fill_manual(values=period_size_color) +
   geom_text(aes(label=STRby_REGIONs),y=115,size = 18/5)+
@@ -388,7 +388,7 @@ fig_2e <- ggplot(expansion_contractionS_di,aes(x=motif_geno,y=frac,fill=factor(d
   theme_cust +
   scale_fill_manual(values=c("#E7B800", "#00AFBB","gray69")) +
   xlab("Motif")+
-  ylab("Percentage of\nALT alleles (%)")  +
+  ylab("Percent of\nALT alleles (%)")  +
   labs(fill="Mutations") +
   geom_text(aes(label=count_motif2),y=105,size = 10*5/14) +
   scale_y_continuous(breaks=c(0, 50, 100),limits = c(0,110) ) 
@@ -1319,7 +1319,7 @@ fig_S3b <- ggplot(refSTR_region,aes(x=gfeatures,y=ps2region,fill=factor(motif_le
   coord_flip() +
   theme_cust +
   xlab("Genomic features")+
-  ylab("Percentage of pSTRs (%)")  +
+  ylab("Percent of pSTRs (%)")  +
   labs(fill="Motif\nlength")+
   scale_fill_manual(values=period_size_color) +
   geom_text(aes(label=STRby_REGIONs),y=115,size = 18/5)+
@@ -1466,7 +1466,7 @@ fig_S4a <- ggplot(subset(expansion_contractionS_134,motif_length==1),aes(x=motif
   coord_flip() +
   scale_fill_manual(values=c("#E7B800", "#00AFBB","gray69")) +
   xlab("Motif")+
-  ylab("Percentage of\nALT alleles (%)")  +
+  ylab("Percent of\nALT alleles (%)")  +
   labs(fill="Mutations") +
   geom_text(aes(label=count_motif2),y=109,size = 12*5/14) +
   scale_y_continuous(breaks=c(0, 50, 100),limits = c(0,113) ) +
@@ -1482,7 +1482,7 @@ fig_S4b <- ggplot(subset(expansion_contractionS_134,motif_length==3),aes(x=motif
   coord_flip() +
   scale_fill_manual(values=c("#E7B800", "#00AFBB","gray69")) +
   xlab("Motif")+
-  ylab("Percentage of\nALT alleles (%)")  +
+  ylab("Percent of\nALT alleles (%)")  +
   labs(fill="Mutations") +
   geom_text(aes(label=count_motif2),y=109,size = 12*5/14) +
   scale_y_continuous(breaks=c(0, 50, 100),limits = c(0,113) ) +
@@ -1497,7 +1497,7 @@ fig_S4c <- ggplot(subset(expansion_contractionS_134,motif_length==4),aes(x=motif
   coord_flip() +
   scale_fill_manual(values=c("#E7B800", "#00AFBB","gray69")) +
   xlab("Motif")+
-  ylab("Percentage of\nALT alleles (%)")  +
+  ylab("Percent of\nALT alleles (%)")  +
   labs(fill="Mutations") +
   geom_text(aes(label=count_motif2),y=109,size = 12*5/14) +
   scale_y_continuous(breaks=c(0, 50, 100),limits = c(0,113) ) +
@@ -1580,7 +1580,7 @@ fig_S5b <- ggplot(MASTR_region,aes(x=gfeatures,y=ps2region,fill=factor(motif_len
   coord_flip() +
   theme_cust +
   xlab("Genomic features")+
-  ylab("Percentage of pSTRs (%)")  +
+  ylab("Percent of pSTRs (%)")  +
   labs(fill="Motif\nlength")+
   scale_fill_manual(values=period_size_color) +
   geom_text(aes(label=STRby_REGIONs),y=115,size = 18/5)+
