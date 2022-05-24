@@ -829,9 +829,11 @@ str_trait_st540_total <- data.table::fread("../processed_data/STR_mutation_trait
 
 data_5a <-str_trait_st540_total %>% 
   dplyr::left_join(strain_ALT_frac, by=c("strain"="isotype")) %>% 
-  dplyr::mutate(p1= ifelse(strain=="ECA1821","del",NA),
-                p2= ifelse(strain=="ECA1821","ins",NA),
-                p3= ifelse(strain=="ECA1821","sub",NA))
+  dplyr::mutate(p1= ifelse(strain=="ECA1253","deletions",NA),
+                p2= ifelse(strain=="ECA1253","insertions",NA),
+                p3= ifelse(strain=="ECA1253","substitutions",NA))
+ 
+
 
 fig_5a <- ggplot(data_5a) + 
   geom_bar(stat='identity',aes( x=fct_reorder(strain, Total_mutation),y = Total_mutation , color=sweep,
@@ -839,6 +841,7 @@ fig_5a <- ggplot(data_5a) +
   theme_cust +
   theme(axis.text.x = element_blank(),
         legend.position =  c(0.35,0.7),
+        axis.title.y =  ggplot2::element_text(size=12,  color = "black",hjust =  -3),
         legend.title = element_blank(),
         legend.background = element_rect(  fill = NA ),
         axis.ticks.x=element_blank())+
@@ -846,15 +849,14 @@ fig_5a <- ggplot(data_5a) +
        y="STR variation",
        fill="Strains",
        color="Strains")+
-   scale_color_manual(values = c("#E7B800", "#FC4E07")) +
+  scale_color_manual(values = c("#E7B800", "#FC4E07")) +
   scale_fill_manual(values = c("#E7B800", "#FC4E07"))  + 
   geom_point(aes(x=fct_reorder(strain, Total_mutation),y = deletion ),color="white",size=0.1,alpha=0.8)+ 
   geom_point(aes(x=fct_reorder(strain, Total_mutation),y = insertion ),color="black",size=0.1,alpha=0.8)+ 
   geom_point(aes(x=fct_reorder(strain, Total_mutation),y = substitution ),color="gray69",size=0.1,alpha=0.8)+
-  geom_text(  aes(label = p1, x="ECA1821", y=23 ),color="white" )+
-  geom_text(  aes(label = p2, x="ECA1821", y=3 ),color="black" )+
-  geom_text(  aes(label = p3, x="ECA1821", y=13 ),color="gray69" )
-
+  geom_text(  aes(label = p1, x="ECA1253", y=23 ),color="white" )+
+  geom_text(  aes(label = p2, x="ECA1253", y=3 ),color="black" )+
+  geom_text(  aes(label = p3, x="ECA1253", y=13 ),color="gray69" )
  
 ###### fig_5b ######
 processed_mapping_thres <- data.table::fread("../processed_data/STR_mutation_trait_manha.tsv") 
@@ -986,27 +988,19 @@ fig_5e <- ggplot(top_mediators_cor,aes(y=Total_mutation,x=exp,color= sweep))+
 #fig_5e
 
 ###### fig_5 ######
-
-fig_5ac <- cowplot::plot_grid(fig_5a, fig_5c,  
-                             labels = c('', 'C' ), 
-                             label_size = 12, 
-                             label_fontfamily="Helvetica",
-                             rel_widths = c(1,1.5),
-                             axis = "tb",
-                             align = "h",
-                             nrow = 1)
+ 
 
 
-fig_5 <- cowplot::plot_grid(fig_5ac, fig_5b, fig_5d,fig_5e,  
-                           labels = c('A', 'B', 'D', 'E'  ), 
-                           label_size = 12, 
-                           label_fontfamily="Helvetica",
-                           rel_heights =  c(1.2 ,1.2,1.5,1.2),
-                           axis = "l",
-                          # align = "v",
-                           nrow = 4)
+fig_5 <- cowplot::plot_grid(fig_5a , fig_5b, fig_5c, fig_5d,fig_5e,  
+                            labels = c('A', 'B',"C", 'D', 'E'  ), 
+                            label_size = 12, 
+                            label_fontfamily="Helvetica",
+                            rel_heights =  c(1  ,1.2,1.2,1.5,1.2),
+                            axis = "l",
+                            # align = "v",
+                            nrow = 5)
 
-ggsave(fig_5, filename = paste( "../figures/Fig_5.png",sep = ""), units = "mm",height = 200, width = 170)
+ggsave(fig_5, filename = paste( "../figures/Fig_5.png",sep = ""), units = "mm",height = 220, width = 170)
 
 
 ############# Figure  6    ###############
