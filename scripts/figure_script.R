@@ -94,23 +94,26 @@ fig_1a <- ggplot() +
 Lrt_localeSTR_eQTL_varexp <- data.table::fread("../processed_data/Lrt_localeSTR_eQTL_varexp.tsv")
 
 Lrt_localeSTR_eQTL_varexp$LD_level2<- factor(Lrt_localeSTR_eQTL_varexp$LD_level,levels = c("High LD","Moderate LD","Low LD"))
-
-
-fig_1b <- ggplot(Lrt_localeSTR_eQTL_varexp,aes(x=eQTL_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)))+
-  geom_point(size=1,alpha=0.5)+
+ 
+fig_1b <- ggplot( ) +
+  geom_point(data=subset(Lrt_localeSTR_eQTL_varexp, nSTR_pheno %in% c(2,3)),
+             aes(x=eQTL_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)),size=1,alpha=0.5)+
+  geom_point(data=subset(Lrt_localeSTR_eQTL_varexp, nSTR_pheno %in% c(4,5,6)),
+             aes(x=eQTL_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)),size=1)+
   theme_cust+
   theme(panel.spacing.x = unit(2,"line"),
         panel.spacing.y = unit(1,"line"),
         legend.position = "bottom")+
   geom_abline(intercept=0,slope=1,colour="black",linetype=2)+
-  scale_y_continuous(breaks=c(0,0.5,  1),expand = c(0, 0), limits = c(0,1))  +
-  scale_x_continuous(breaks=c(0, 0.5, 1),expand = c(0, 0), limits = c(0,1)) +
+  scale_y_continuous(breaks=c(0,0.5,  1),#expand = c(0, 0), 
+                     limits = c(0,1))  +
+  scale_x_continuous(breaks=c(0, 0.5, 1),#expand = c(0, 0), 
+                     limits = c(0,1)) +
   facet_grid( str_genotype ~LD_level2 ) +
   ylab("Variance explained by eSTRs")+
   xlab("Variance explained by local eQTL") +
-  labs(color="Number of STR alleles")+
-  scale_color_manual(values=c("mediumpurple4","#D55E00", "burlywood3", "#0072B2","#009E73"))
- 
+  labs(color="Number of STR alleles") +
+  scale_color_manual(values=c("2"="gray","3"="#D55E00", "4"="mediumpurple4", "5"="#0072B2","6"="red"))
 
 ###### fig_1  ######
 
@@ -167,20 +170,23 @@ data_fig_3a <- data.table::fread("../processed_data/Lrt_distanteSTR_eQTL_varexp.
 
 data_fig_3a$LD_level2<- factor(data_fig_3a$LD_level,levels = c("High LD","Moderate LD","Low LD"))
 
-fig_3a <- ggplot(data_fig_3a,aes(x=eQTL_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)))+
-  geom_point(size=1,alpha=0.5)+
+fig_3a <- ggplot()+
+  geom_point(data = subset(data_fig_3a, nSTR_pheno %in% c(2,3)),
+             aes(x=eQTL_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)), size=1,alpha=0.5)+
+  geom_point(data = subset(data_fig_3a, nSTR_pheno %in% c(4,5 )),
+             aes(x=eQTL_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)), size=1)+
   theme_cust+
   theme(panel.spacing.x = unit(2,"line"),
         panel.spacing.y = unit(1,"line"),
         legend.position = "bottom")+
   geom_abline(intercept=0,slope=1,colour="black",linetype=2)+
-  scale_y_continuous(breaks=c(0,0.5,  1),expand = c(0, 0), limits = c(0,1))  +
-  scale_x_continuous(breaks=c(0, 0.5, 1),expand = c(0, 0), limits = c(0,1)) +
+  scale_y_continuous(breaks=c(0,0.5,  1), limits = c(0,1))  +
+  scale_x_continuous(breaks=c(0, 0.5, 1), limits = c(0,1)) +
   facet_grid( str_genotype ~LD_level2 ) +
   ylab("Variance explained\nby eSTRs")+
   xlab("Variance explained by distant eQTL") +
-  labs(color="Number of STR alleles")+
-  scale_color_manual(values=c("mediumpurple4","#D55E00", "burlywood3", "#0072B2","#009E73"))
+  labs(color="Number of STR alleles") +
+  scale_color_manual(values=c("2"="gray","3"="#D55E00", "4"="mediumpurple4", "5"="#0072B2" ))
 
 ###### fig_3b ######
 data_fig_3b <- data.table::fread("../processed_data/Lrt_hotspot_eSTRs.tsv") %>% 
