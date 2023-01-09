@@ -49,8 +49,8 @@ factoral_eSTR_lrt_log <- factoral_eSTR_lrt_supp2 %>%
 
 ## plot 
 factoral_eSTR_lrt_df <- factoral_eSTR_lrt_log %>% 
-  dplyr::select(transcript,pSTR,distance,real_lrt_p,perm_lrt_p,str_genotype,bf_thres) %>% 
-  tidyr::gather(type,padj,-transcript,-pSTR,-distance,-str_genotype,-bf_thres) %>% 
+  dplyr::select(transcript,pSTR,distance,real_lrt_p,perm_lrt_p,str_genotype,bf_thres,nSTR_pheno) %>% 
+  tidyr::gather(type,padj,-transcript,-pSTR,-distance,-str_genotype,-bf_thres,-nSTR_pheno) %>% 
   dplyr::mutate(type=ifelse(type=="real_lrt_p","Real STR","Permuted STR")) %>% 
   dplyr::ungroup()  
 
@@ -89,6 +89,85 @@ fig_1a <- ggplot() +
   facet_grid(.~str_genotype,scales="free")
  
 
+fig_1a <- ggplot() +
+#  geom_point(data=factoral_eSTR_lrt_df, alpha=0.8,size=0.2,shape=20, aes(x=distance,y=padj,color=type)) +
+  geom_point(data=subset(factoral_eSTR_lrt_log, nSTR_pheno %in% c(2,3)), alpha=0.8,size=0.2,shape=20, aes(x=distance,y=real_lrt_p,color=factor(nSTR_pheno))) +
+  geom_point(data=subset(factoral_eSTR_lrt_log, nSTR_pheno %in% c(4,5,6,7)), alpha=0.8,size=0.2,shape=20, aes(x=distance,y=real_lrt_p,color=factor(nSTR_pheno)))+
+  geom_point(data=factoral_eSTR_lrt_log, alpha=0.8,size=0.2,shape=20, aes(x=distance,y=perm_lrt_p ),color="black") +
+  geom_line(data=perc_eSTR,  aes(x=distance,y=padj),color="darkorange1",size=1)+
+ # scale_color_manual(values=c("darkgray","lightskyblue2")) + 
+  geom_hline(data=perc_eSTR,aes(yintercept = bf_thres),
+             color = "red",
+             linetype=3 )+
+  theme_cust+
+  theme(legend.position = "none") +
+  labs(x="Distance to TSS (Mb)", 
+       color="")+
+  theme(legend.position = "none", panel.spacing = unit(2,"line")) + 
+  scale_x_continuous(expand = c(0 , 0.01) ) + 
+  scale_y_continuous( expand = c(0, 0) ,name = expression(-log[10](italic(p))), 
+                      sec.axis = sec_axis( trans=~./10, name="Mean percentile of\nsignificant STRs / 20 kb") )+
+  facet_grid(.~str_genotype,scales="free")+
+  scale_color_manual(values=c("2"="gray","3"="#D55E00", "4"="mediumpurple4", "5"="#0072B2","6"="red","7"="lightskyblue2"))
+
+
+fig_1a <- ggplot() +
+  geom_point(data=factoral_eSTR_lrt_df, alpha=0.8,size=0.2,shape=20, aes(x=distance,y=padj,color=type)) +
+  geom_line(data=perc_eSTR,  aes(x=distance,y=padj),color="darkorange1",size=1)+
+  scale_color_manual(values=c("darkgray","lightskyblue2")) + 
+  geom_hline(data=perc_eSTR,aes(yintercept = bf_thres),
+             color = "red",
+             linetype=3 )+
+  theme_cust+
+  theme(legend.position = "none") +
+  labs(x="Distance to TSS (Mb)", 
+       color="")+
+  theme(legend.position = "none", panel.spacing = unit(2,"line")) + 
+  scale_x_continuous(expand = c(0 , 0.01) ) + 
+  scale_y_continuous( expand = c(0, 0) ,name = expression(-log[10](italic(p))), 
+                      sec.axis = sec_axis( trans=~./10, name="Mean percentile of\nsignificant STRs / 20 kb") )+
+  facet_grid(.~str_genotype,scales="free")
+
+
+
+fig_1a <- ggplot() +
+  geom_point(data=factoral_eSTR_lrt_log, alpha=0.8,size=0.2,shape=20, aes(x=distance,y=real_lrt_p )) +
+  #geom_line(data=perc_eSTR,  aes(x=distance,y=padj),color="darkorange1",size=1)+
+ # scale_color_manual(values=c("darkgray","lightskyblue2")) + 
+  geom_hline(data=perc_eSTR,aes(yintercept = bf_thres),
+             color = "red",
+             linetype=3 )+
+  theme_cust+
+  theme(legend.position = "none") +
+  labs(x="Distance to TSS (Mb)", 
+       color="")+
+  theme(legend.position = "none", panel.spacing = unit(2,"line")) + 
+  scale_x_continuous(expand = c(0 , 0.01) ) + 
+  scale_y_continuous( expand = c(0, 0) ,name = expression(-log[10](italic(p))), 
+                      sec.axis = sec_axis( trans=~./10, name="Mean percentile of\nsignificant STRs / 20 kb") )+
+  facet_grid(nSTR_pheno~str_genotype,scales="free")
+
+
+fig_1a <- ggplot() +
+  geom_point(data=factoral_eSTR_lrt_log, alpha=0.8,size=0.2,shape=20, aes(x=distance,y=real_lrt_p ,color=factor(nSTR_pheno))) +
+  #geom_line(data=perc_eSTR,  aes(x=distance,y=padj),color="darkorange1",size=1)+
+  # scale_color_manual(values=c("darkgray","lightskyblue2")) + 
+  # geom_hline(data=perc_eSTR,aes(yintercept = bf_thres),
+  #            color = "red",
+  #            linetype=3 )+
+    theme_cust+
+  theme(legend.position = "none") +
+  labs(x="Distance to TSS (Mb)", 
+       color="")+
+  theme(legend.position = "none", panel.spacing.x  = unit(2,"line")) + 
+  scale_x_continuous(expand = c(0 , 0.01) ) + 
+  # scale_y_continuous( expand = c(0, 0) ,name = expression(-log[10](italic(p))), 
+  #                     sec.axis = sec_axis( trans=~./10, name="Mean percentile of\nsignificant STRs / 20 kb") )+
+    facet_grid(nSTR_pheno~str_genotype,scales="free")+
+  scale_color_manual(values=c("2"="gray","3"="#D55E00", "4"="mediumpurple4", "5"="#0072B2","6"="red","7"="lightskyblue2"))
+
+
+
 ###### fig_1b ######
 
 Lrt_localeSTR_eQTL_varexp <- data.table::fread("../processed_data/Lrt_localeSTR_eQTL_varexp.tsv")
@@ -118,7 +197,7 @@ fig_1b <- ggplot( ) +
 ###### fig_1  ######
 
 fig_1 <- cowplot::plot_grid(fig_1a, fig_1b,  
-                           labels = c('a', 'b' ), 
+                           labels = c('A', 'B' ), 
                            label_size = 12, 
                            label_fontfamily="Helvetica",
                            rel_heights = c(1,1.5),
@@ -217,7 +296,7 @@ fig_3b <- ggplot() +
 
 
 fig_3 <- cowplot::plot_grid(fig_3a, fig_3b,   
-                            labels = c('a', 'b' ), 
+                            labels = c('A', 'B' ), 
                             label_size = 12, 
                             label_fontfamily="Helvetica",
                             rel_heights = c(1.4,1),
@@ -314,7 +393,7 @@ fig_4b <- ggplot(top_mediators_cor,aes(y=Total_mutation,x=exp,color=ext_gene ))+
 
 
 fig_4 <- cowplot::plot_grid(  fig_4a,fig_4b,  
-                            labels = c('a', 'b'  ), 
+                            labels = c('A', 'B'  ), 
                             label_size = 12, 
                             label_fontfamily="Helvetica",
                             rel_heights =  c( 1.6,1 ),
@@ -429,7 +508,7 @@ fig_S1a2 <- cowplot::plot_grid(fig_S1a,  NULL,
 
 
 fig_S1  <- cowplot::plot_grid(fig_S1a2,fig_S1b,
-                              labels = c('a', 'b' ), 
+                              labels = c('A', 'B' ), 
                               label_size = 12, 
                               label_fontfamily="Helvetica",
                               rel_heights = c(0.5,1),
@@ -484,7 +563,7 @@ fig_S2a2 <- cowplot::plot_grid(fig_S2a,  NULL,  NULL,  NULL,
 
 
 fig_S2  <- cowplot::plot_grid(fig_S2a2,fig_S2b,
-                              labels = c('a', 'b' ), 
+                              labels = c('A', 'B' ), 
                               label_size = 12, 
                               label_fontfamily="Helvetica",
                               rel_heights = c(0.5,1),
@@ -552,7 +631,7 @@ fig_S3c <- nema_manha_plot(data_fig_S3c)
   
 ### cow fig_S3 ####
 fig_S3 <- cowplot::plot_grid(fig_S3a , fig_S3b, fig_S3c,
-                            labels = c('a', 'b' ,'c' ), 
+                            labels = c('A', 'B' ,'C' ), 
                             rel_heights = c(1.5,2,2),
                             label_size = 12, 
                             label_fontfamily="Helvetica",
