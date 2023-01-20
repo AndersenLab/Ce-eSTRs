@@ -364,7 +364,7 @@ ggsave(fig_4, filename = paste( "../figures/fig_4.png",sep = ""), units = "mm",h
 
 
 
-############# Figure  4    #############
+############# Figure  5    #############
 #           MA lines mutation rate     #
 #########################################
 
@@ -599,6 +599,66 @@ ggsave(fig_S3, filename = paste( "../figures/Supp_fig3_manha.png",sep = ""), uni
  
 
  
+
+
+
+############# Figure  S8    #############
+#           MA u gfeature               #
+#########################################
+
+
+
+MA_u_feature <- data.table::fread("../processed_data/MA_u_feature.tsv")  %>% 
+  dplyr::filter(gfeature %in% c("3'UTR","5'UTR","enhancer","intergenic","intron","promoter","CDS"))
+
+ 
+data_fig_S8_stats <- ggpubr::compare_means( mutation_rate ~ strain, 
+                                           data= MA_u_feature ,
+                                           group.by = c( "mutation","gfeature" ),  
+                                           p.adjust.method = "bonferroni", 
+                                           ref.group = "mev-1",
+                                           label = "p.signif", 
+                                           method = "wilcox.test" ) %>% 
+  #  dplyr::filter(p.adj<0.05)%>% 
+  dplyr::select(-p.format,-p.signif) %>% 
+  dplyr::mutate(group_factor="mutation",
+                group_factor_catogory=mutation,
+                method="two-sided Wilcoxon test",
+                padjustment="BF") %>% 
+  dplyr::select(method,group_factor,group_factor_catogory,gfeature, group1,group2,p,padjustment,p.adj)
+
+
+write.table(data_fig_S8_stats, paste("/Users/gaotian/Documents/GitHub/Ce-eSTRs/processed_data/Supplementary_File_1.tsv",sep = ""), sep = "\t", row.names = F, quote = FALSE)
+
+MA_u_feature$gfeatures<- factor(MA_u_feature$gfeature,levels = c("promoter","enhancer","5'UTR","CDS","intron","3'UTR", "intergenic"))
+
+
+
+fig_S8 <- ggpubr::ggboxplot(MA_u_feature, x="strain",y="mutation_rate",outlier.shape = NA,
+                           color="strain"  ) +
+  geom_point( position = position_jitterdodge(jitter.width = 1) ,aes(color=strain), size=0.5, alpha=0.8)+
+  facet_grid(mutation~gfeatures,scales="free")+
+  theme_cust +
+  theme(legend.position = "bottom",
+      #  axis.text.y =  ggplot2::element_text(size=12,  color = "black",angle = 90),
+        axis.text.x = element_blank(),
+        axis.title.x = element_blank())+
+  scale_color_manual(values = c("orange","#007e2f","plum4","#721b3e"), labels=expression(N2,PB306, italic('mev-1') )) +
+  labs(color="MA lines",
+    y="Mutation rate" ) + 
+  ggpubr::stat_compare_means( 
+    label = "p.signif",   
+    ref.group = "mev-1",
+    symnum.args = list(cutpoints = c(0, 0.000018,0.000022, 0.0003, 0.0011, 1), 
+                       symbols = c("****","***","**", "*",  "ns")),
+    size = 3,
+    method = "wilcox.test") +
+  scale_y_continuous( expand = c(0.1, 0), breaks   = c(0,  0.0001,  0.0002)  )
+
+
+
+ggsave(fig_S8, filename = paste( "../figures/Supp_fig8_MA_u_gf.png",sep = ""), units = "mm",height = 170, width = 175)
+
 
 
 
