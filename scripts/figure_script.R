@@ -127,7 +127,8 @@ ggsave(fig_S1_new, filename = paste("../figures/supp_fig1_new.png",sep = ""), un
 
 ###### fig_1b ######
 
-Lrt_localeSTR_eQTL_varexp <- data.table::fread("../processed_data/Lrt_localeSTR_eQTL_varexp.tsv")
+Lrt_localeSTR_eQTL_varexp <- data.table::fread("../processed_data/Lrt_localeSTR_eQTL_varexp.tsv")  %>% 
+  dplyr::mutate(str_genotype=ifelse(str_genotype=="STR genotype","STR\ngenotype","STR\nlength"))
 
 Lrt_localeSTR_eQTL_varexp$LD_level2<- factor(Lrt_localeSTR_eQTL_varexp$LD_level,levels = c("High LD","Moderate LD","Low LD"))
  
@@ -137,7 +138,7 @@ fig_1b <- ggplot( ) +
   geom_point(data=subset(Lrt_localeSTR_eQTL_varexp, nSTR_pheno %in% c(4,5,6)),
              aes(x=eQTL_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)),size=1)+
   theme_cust+
-  theme(panel.spacing.x = unit(2,"line"),
+  theme(panel.spacing.x = unit(1,"line"),
         panel.spacing.y = unit(1,"line"),
         legend.position = "bottom")+
   geom_abline(intercept=0,slope=1,colour="black",linetype=2)+
@@ -151,18 +152,48 @@ fig_1b <- ggplot( ) +
   labs(color="Number of STR alleles") +
   scale_color_manual(values=c("2"="gray","3"="#D55E00", "4"="mediumpurple4", "5"="#0072B2","6"="black"))
 
+
+###### fig_1c ######
+
+data_fig1c <- data.table::fread("../processed_data/LRT_TOPeSTR_MostSIG_localSNVs_LD_varexp.tsv") %>% 
+  dplyr::mutate(str_genotype=ifelse(str_genotype=="STR genotype","STR\ngenotype","STR\nlength"))
+
+data_fig1c$LD_level2<- factor(data_fig1c$LD_level,levels = c("High LD","Moderate LD","Low LD"))
+
+
+fig_1c <- ggplot( ) +
+  geom_point(data=subset(data_fig1c, nSTR_pheno %in% c(2,3)),
+             aes(x=SNV_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)),size=1,alpha=0.5)+
+  geom_point(data=subset(data_fig1c, nSTR_pheno %in% c(4,5,6)),
+             aes(x=SNV_var_exp,y=STR_var_exp,color=factor(nSTR_pheno)),size=1)+
+  theme_cust+
+  theme(panel.spacing.x = unit(1,"line"),
+        panel.spacing.y = unit(1,"line"),
+        legend.position = "none")+
+  geom_abline(intercept=0,slope=1,colour="black",linetype=2)+
+  scale_y_continuous(breaks=c(0,0.5,  1),#expand = c(0, 0), 
+                     limits = c(0,1))  +
+  scale_x_continuous(breaks=c(0, 0.5, 1),#expand = c(0, 0), 
+                     limits = c(0,1)) +
+  facet_grid( str_genotype ~LD_level2 ) +
+  ylab("Variance explained by eSTRs")+
+  xlab("Variance explained by the most significant local SNVs") +
+  labs(color="Number of STR alleles") +
+  scale_color_manual(values=c("2"="gray","3"="#D55E00", "4"="mediumpurple4", "5"="#0072B2","6"="black"))
+
+
 ###### fig_1  ######
 
-fig_1 <- cowplot::plot_grid(fig_1a, fig_1b,  
-                           labels = c('A', 'B' ), 
+fig_1 <- cowplot::plot_grid(fig_1a, fig_1b, fig_1c, 
+                           labels = c('a', 'b' ,'c'), 
                            label_size = 12, 
                            label_fontfamily="Helvetica",
-                           rel_heights = c(1,1.5),
+                           rel_heights = c(1.05,1.78,1.47),
                            axis = "lr",
                            #    align = "v",
-                           nrow = 2)
+                           nrow = 3)
 
-ggsave(fig_1, filename = paste("../figures/fig_1.png",sep = ""), units = "mm",height = 160, width = 170)
+ggsave(fig_1, filename = paste("../figures/fig_1.png",sep = ""), units = "mm",height = 200, width = 170)
 
 
 
@@ -176,21 +207,22 @@ str_exp_pxg <- data.table::fread("../processed_data/str_exp_pxg.tsv")
 data_fig_2a <- str_exp_pxg %>% 
   dplyr::filter(pSTR=="STR_24584")
 
-fig_2a <- ggplot(data_fig_2a,aes(x=as.factor(genotype),y=expression ))+
-  geom_jitter(shape=21,position=position_jitter(0.2),aes(fill=STRallele) ) +
-  geom_boxplot( outlier.shape = NA,alpha=0.5) +
+
+
+fig_2a <- ggplot() +
+  geom_jitter(data = data_fig_2a,aes(x=as.factor(genotype),y=expression ), shape=21,position=position_jitter(0.2),fill="gray69" ) +
+  geom_boxplot(data = data_fig_2a,aes(x=as.factor(genotype),y=expression ),  outlier.shape = NA,alpha=0.5) +
+  geom_jitter(data = subset(data_fig_2a, strain %in% c("N2","CB4856")),aes(x=as.factor(genotype),y=expression ,fill=strain), shape=21,position=position_jitter(0.2) ,size=2 ) +
   theme_cust+
   theme(strip.text = ggplot2::element_text(size=12, vjust = 1,  color = "black",face = "italic"),
-        legend.position = "none")+
-  ggplot2::scale_fill_manual(values = c("REF"="orange","ALT"="blue") )+
+        legend.position = "bottom")+
+  ggplot2::scale_fill_manual(values = c("N2"="orange","CB4856"="blue") ,name="Strain")+
   xlab("Length of STR_24584") + ylab("Expression") +  
   facet_grid(.~transcript ,scales = "free") +
   scale_y_continuous(breaks=c(-1,1,3,5),expand = c(0, 0), limits = c(-1,6))
 
 
-ggsave(fig_2a, filename = paste( "../figures/fig_2a.png",sep = ""), units = "mm",height = 60, width = 170)
-
-
+ggsave(fig_2a, filename = paste( "../figures/fig_2a.png",sep = ""), units = "mm",height = 80, width = 170)
 
 
 
