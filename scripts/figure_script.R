@@ -90,41 +90,6 @@ fig_1a <- ggplot() +
   
 
 
-perc_sig <- factoral_eSTR_lrt_log %>% 
-  dplyr::filter(str_genotype=="STR genotype" & nSTR_pheno==6)
-  dplyr::ungroup() %>% 
-  dplyr::mutate(sig=ifelse(real_lrt_p > bf_thres,"pass","no")) %>% 
-  dplyr::group_by(nSTR_pheno,sig) %>% 
-  dplyr::count() %>% 
-  tidyr::spread(sig,n) %>% 
-  dplyr::mutate(sig_perc=100*pass/(pass+no))
-
-
-
-
-
-
-
- 
-fig_S1_new <- ggplot() +
-  geom_point(data=factoral_eSTR_lrt_log, alpha=0.8,size=0.2,shape=20, aes(x=distance,y=real_lrt_p ,color=factor(nSTR_pheno)))  +
-  geom_hline(data=perc_eSTR,aes(yintercept = bf_thres),
-             color = "black",
-             linetype=3 )+
-    theme_cust+
-  theme(legend.position = "none") +
-  labs(x="Distance to TSS (Mb)", 
-       y=expression(-log[10](italic(p))) )+
-  theme(legend.position = "none", panel.spacing.x  = unit(2,"line")) + 
-  scale_x_continuous(expand = c(0 , 0.01) ) + 
-    facet_grid(nSTR_pheno~str_genotype,scales="free")+
-  scale_color_manual(values=c("2"="gray","3"="#D55E00", "4"="mediumpurple4", "5"="#0072B2","6"="red","7"="lightskyblue2"))
-
-
-ggsave(fig_S1_new, filename = paste("../figures/supp_fig1_new.png",sep = ""), units = "mm",height = 160, width = 170)
-
-
-
 ###### fig_1b ######
 
 Lrt_localeSTR_eQTL_varexp <- data.table::fread("../processed_data/Lrt_localeSTR_eQTL_varexp.tsv")  %>% 
@@ -222,7 +187,7 @@ fig_2a <- ggplot() +
   scale_y_continuous(breaks=c(-1,1,3,5),expand = c(0, 0), limits = c(-1,6))
 
 
-ggsave(fig_2a, filename = paste( "../figures/fig_2a.png",sep = ""), units = "mm",height = 80, width = 170)
+ggsave(fig_2a, filename = paste( "../figures/Fig_2a.png",sep = ""), units = "mm",height = 80, width = 170)
 
 
 
@@ -443,8 +408,55 @@ ggsave(fig_5, filename = paste( "../figures/fig_5.png",sep = ""), units = "mm",h
 
 
 ##############################################
-  
-############# Figure  S1    #############
+
+
+
+
+############# Figure  S2    #############
+#     LRT sep by allele number          #
+#########################################
+
+fig_S2 <- ggplot() +
+  geom_point(data=factoral_eSTR_lrt_log, alpha=0.8,size=0.2,shape=20, aes(x=distance,y=real_lrt_p ,color=factor(nSTR_pheno)))  +
+  geom_hline(data=perc_eSTR,aes(yintercept = bf_thres),
+             color = "black",
+             linetype=3 )+
+  theme_cust+
+  theme(legend.position = "none") +
+  labs(x="Distance to TSS (Mb)", 
+       y=expression(-log[10](italic(p))) )+
+  theme(legend.position = "none", panel.spacing.x  = unit(2,"line")) + 
+  scale_x_continuous(expand = c(0 , 0.01) ) + 
+  facet_grid(nSTR_pheno~str_genotype,scales="free")+
+  scale_color_manual(values=c("2"="gray","3"="#D55E00", "4"="mediumpurple4", "5"="#0072B2","6"="red","7"="lightskyblue2"))
+
+
+ggsave(fig_S2, filename = paste("../figures/supp_fig2_multiA.png",sep = ""), units = "mm",height = 160, width = 170)
+
+
+
+############# Figure  S3    #############
+#              heritability             #
+#########################################
+
+SNV_STR_h2 <- data.table::fread("../processed_data/SNV_STR_h2.tsv")
+
+
+fig_S3_h2 <- 
+  ggplot(SNV_STR_h2,aes(x=h2_SNV,y=h2_SNV_STR))+
+  geom_point(color="gray",size=0.5 )+
+  theme_cust+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())+ 
+  geom_abline(intercept=0,slope=1,colour="black",linetype=2)+
+  xlab(expression(paste(italic(h^2), " using SNVs"))) +
+  ylab(expression(paste(italic(h^2), " using SNVs and STRs")))
+
+
+ggsave(fig_S3_h2, filename = paste("../figures/supp_fig3_h2.png",sep = ""), units = "mm",height = 100, width = 100)
+
+
+############# Figure  S7    #############
 #              STR_13795                #
 #########################################
 
@@ -457,14 +469,14 @@ list2 <- str_exp_pxg %>%
   dplyr::count() %>% 
   dplyr::filter(n>1)
 
-data_fig_S1 <- str_exp_pxg %>% 
+data_fig_S7 <- str_exp_pxg %>% 
   dplyr::filter(pSTR=="STR_13795") %>% 
   dplyr::mutate(overlap=ifelse(transcript %in% list2$transcript,"yes","no")) %>% 
   dplyr::mutate(transcript = paste(ext_gene, transcript, sep="\n")) 
 
-data_fig_S1$genotype2<- factor(data_fig_S1$genotype,levels = unique(data_fig_S1$genotype))
+data_fig_S7$genotype2<- factor(data_fig_S7$genotype,levels = unique(data_fig_S7$genotype))
 
-fig_S1a <- ggplot(subset(data_fig_S1,ext_gene=="cls-2"),aes(x=as.factor(genotype2),y=expression ))+
+fig_S7a <- ggplot(subset(data_fig_S7,ext_gene=="cls-2"),aes(x=as.factor(genotype2),y=expression ))+
   geom_jitter(shape=21,position=position_jitter(0.2),aes(fill=STRallele) ) +
   geom_boxplot( outlier.shape = NA,alpha=0.5) +
   theme_cust+
@@ -475,7 +487,7 @@ fig_S1a <- ggplot(subset(data_fig_S1,ext_gene=="cls-2"),aes(x=as.factor(genotype
   ylab("Expression") +  
   facet_grid(.~transcript ,scales = "free") 
 
-fig_S1b <- ggplot(subset(data_fig_S1,ext_gene!="cls-2"),aes(x=as.factor(genotype2),y=expression ))+
+fig_S7b <- ggplot(subset(data_fig_S7,ext_gene!="cls-2"),aes(x=as.factor(genotype2),y=expression ))+
   geom_jitter(position=position_jitter(0.2),aes(fill=STRallele) ,shape=21) +
   geom_boxplot( outlier.shape = NA,alpha=0.5,aes(color=overlap)) +
   theme_cust+
@@ -488,7 +500,7 @@ fig_S1b <- ggplot(subset(data_fig_S1,ext_gene!="cls-2"),aes(x=as.factor(genotype
   facet_wrap(.~transcript ,scales = "free",nrow=2) 
 
 
-fig_S1a2 <- cowplot::plot_grid(fig_S1a,  NULL,  
+fig_S7a2 <- cowplot::plot_grid(fig_S7a,  NULL,  
                                label_size = 12, 
                                label_fontfamily="Helvetica",
                                nrow = 1)
@@ -496,8 +508,8 @@ fig_S1a2 <- cowplot::plot_grid(fig_S1a,  NULL,
 
 
 
-fig_S1  <- cowplot::plot_grid(fig_S1a2,fig_S1b,
-                              labels = c('A', 'B' ), 
+fig_S7  <- cowplot::plot_grid(fig_S7a2,fig_S7b,
+                              labels = c('a', 'b' ), 
                               label_size = 12, 
                               label_fontfamily="Helvetica",
                               rel_heights = c(0.5,1),
@@ -505,22 +517,22 @@ fig_S1  <- cowplot::plot_grid(fig_S1a2,fig_S1b,
                               nrow = 2)
 
 
-ggsave(fig_S1, filename = paste("../figures/supp_fig1_STR13795.png",sep = ""), units = "mm",height = 160, width = 170)
+ggsave(fig_S7, filename = paste("../figures/supp_fig7_STR13795.png",sep = ""), units = "mm",height = 160, width = 170)
 
 
 
-############# Figure  S2    #############
+############# Figure  S8    #############
 #              STR_13083                #
 #########################################
 
-data_fig_S2 <- str_exp_pxg %>% 
+data_fig_S8 <- str_exp_pxg %>% 
   dplyr::filter(pSTR=="STR_13083")%>% 
   dplyr::mutate(overlap=ifelse(transcript %in% list2$transcript,"yes","no"))%>% 
   dplyr::mutate(transcript = paste(ext_gene, transcript, sep="\n"))
 
-data_fig_S2$genotype2<- factor(data_fig_S2$genotype,levels = unique(data_fig_S2$genotype))
+data_fig_S8$genotype2<- factor(data_fig_S8$genotype,levels = unique(data_fig_S8$genotype))
 
-fig_S2a <- ggplot(subset(data_fig_S2,ext_gene=="polq-1"),aes(x=as.factor(genotype2),y=expression ))+
+fig_S8a <- ggplot(subset(data_fig_S8,ext_gene=="polq-1"),aes(x=as.factor(genotype2),y=expression ))+
   geom_jitter( position=position_jitter(0.2),aes(fill=STRallele) ,shape=21 ) +
   geom_boxplot( outlier.shape = NA,alpha=0.5,aes(color=overlap)) +
   theme_cust+
@@ -532,7 +544,7 @@ fig_S2a <- ggplot(subset(data_fig_S2,ext_gene=="polq-1"),aes(x=as.factor(genotyp
   ylab("Expression") +  
   facet_grid(.~transcript ,scales = "free") 
 
-fig_S2b <- ggplot(subset(data_fig_S2,ext_gene!="polq-1"),aes(x=as.factor(genotype2),y=expression ))+
+fig_S8b <- ggplot(subset(data_fig_S8,ext_gene!="polq-1"),aes(x=as.factor(genotype2),y=expression ))+
   geom_jitter( position=position_jitter(0.2),aes(fill=STRallele )  ,shape=21) +
   geom_boxplot( outlier.shape = NA,alpha=0.5,aes(color=overlap)) +
   theme_cust+
@@ -545,39 +557,39 @@ fig_S2b <- ggplot(subset(data_fig_S2,ext_gene!="polq-1"),aes(x=as.factor(genotyp
   facet_wrap(.~transcript ,scales = "free",nrow=2) 
 
 
-fig_S2a2 <- cowplot::plot_grid(fig_S2a,  NULL,  NULL,  NULL,   
+fig_S8a2 <- cowplot::plot_grid(fig_S8a,  NULL,  NULL,  NULL,   
                                label_size = 12, 
                                label_fontfamily="Helvetica",
                                nrow = 1)
 
 
-fig_S2  <- cowplot::plot_grid(fig_S2a2,fig_S2b,
-                              labels = c('A', 'B' ), 
+fig_S8  <- cowplot::plot_grid(fig_S8a2,fig_S8b,
+                              labels = c('a', 'b' ), 
                               label_size = 12, 
                               label_fontfamily="Helvetica",
                               rel_heights = c(0.5,1),
                               axis = "lr",
                               nrow = 2)
 
-ggsave(fig_S2, filename = paste("../figures/Supp_fig2_STR13083.png",sep = ""), units = "mm",height = 160, width = 170)
+ggsave(fig_S8, filename = paste("../figures/supp_fig8_STR13083.png",sep = ""), units = "mm",height = 160, width = 170)
 
 
 
-############# Figure  S3    #############
+############# Figure  S9    #############
 #           manha                       #
 #########################################
 
-###### fig_S3 ######
+###### fig_S9 ######
 
 str_trait_st207_total <- data.table::fread("../processed_data/STR_mutation_trait.tsv")  
 
 
-data_fig_S3a <-str_trait_st207_total %>% 
+data_fig_S9a <-str_trait_st207_total %>% 
   dplyr::mutate(p1= ifelse(strain=="MY23","deletions",NA),
                 p2= ifelse(strain=="MY23","insertions",NA),
                 p3= ifelse(strain=="MY23","substitutions",NA)) 
 
-fig_S3a <- ggplot(data_fig_S3a) + 
+fig_S9a <- ggplot(data_fig_S9a) + 
   geom_bar(stat='identity',aes( x=fct_reorder(strain, Total_mutation),y = Total_mutation ),fill="gray69",color="gray69")+
   theme_cust +
   theme(axis.text.x = element_blank(),
@@ -604,37 +616,37 @@ fig_S3a <- ggplot(data_fig_S3a) +
 
 
 
-###### fig_S3b ######
+###### fig_S9b ######
 
-data_fig_S3b <- data.table::fread("../processed_data/STR_nema_manha207.tsv") 
+data_fig_S9b <- data.table::fread("../processed_data/STR_nema_manha207.tsv") 
  
-fig_S3b <- nema_manha_plot(data_fig_S3b)
+fig_S9b <- nema_manha_plot(data_fig_S9b)
 
-###### fig_S3c ######
+###### fig_S9c ######
  
 
-data_fig_S3c <- data.table::fread("../processed_data/STR_nema_manha_reg206.tsv") 
+data_fig_S9c <- data.table::fread("../processed_data/STR_nema_manha_reg206.tsv") 
  
-fig_S3c <- nema_manha_plot(data_fig_S3c)
+fig_S9c <- nema_manha_plot(data_fig_S9c)
 
   
-### cow fig_S3 ####
-fig_S3 <- cowplot::plot_grid(fig_S3a , fig_S3b, fig_S3c,
-                            labels = c('A', 'B' ,'C' ), 
+### cow fig_S9 ####
+fig_S9 <- cowplot::plot_grid(fig_S9a , fig_S9b, fig_S9c,
+                            labels = c('a', 'b' ,'c' ), 
                             rel_heights = c(1.5,2,2),
                             label_size = 12, 
                             label_fontfamily="Helvetica",
                             axis = "lr",
                             nrow =  3)
 
-ggsave(fig_S3, filename = paste( "../figures/Supp_fig3_manha.png",sep = ""), units = "mm",height = 180, width = 170)
+ggsave(fig_S9, filename = paste( "../figures/supp_fig9_manha.png",sep = ""), units = "mm",height = 180, width = 170)
  
 
  
 
 
 
-############# Figure  S8    #############
+############# Figure  S11    #############
 #           MA u gfeature               #
 #########################################
 
@@ -644,7 +656,7 @@ MA_u_feature <- data.table::fread("../processed_data/MA_u_feature.tsv")  %>%
   dplyr::filter(gfeature %in% c("3'UTR","5'UTR","enhancer","intergenic","intron","promoter","CDS"))
 
  
-data_fig_S8_stats <- ggpubr::compare_means( mutation_rate ~ strain, 
+data_fig_S11_stats <- ggpubr::compare_means( mutation_rate ~ strain, 
                                            data= MA_u_feature ,
                                            group.by = c( "mutation","gfeature" ),  
                                            p.adjust.method = "bonferroni", 
@@ -660,13 +672,13 @@ data_fig_S8_stats <- ggpubr::compare_means( mutation_rate ~ strain,
   dplyr::select(method,group_factor,group_factor_catogory,gfeature, group1,group2,p,padjustment,p.adj)
 
 
-write.table(data_fig_S8_stats, paste("/Users/gaotian/Documents/GitHub/Ce-eSTRs/processed_data/Supplementary_File_1.tsv",sep = ""), sep = "\t", row.names = F, quote = FALSE)
+write.table(data_fig_S11_stats, paste("/Users/gaotian/Documents/GitHub/Ce-eSTRs/processed_data/supplementary_data_S5.tsv",sep = ""), sep = "\t", row.names = F, quote = FALSE)
 
 MA_u_feature$gfeatures<- factor(MA_u_feature$gfeature,levels = c("promoter","enhancer","5'UTR","CDS","intron","3'UTR", "intergenic"))
 
 
 
-fig_S8 <- ggpubr::ggboxplot(MA_u_feature, x="strain",y="mutation_rate",outlier.shape = NA,
+fig_S11 <- ggpubr::ggboxplot(MA_u_feature, x="strain",y="mutation_rate",outlier.shape = NA,
                            color="strain"  ) +
   geom_point( position = position_jitterdodge(jitter.width = 1) ,aes(color=strain), size=0.5, alpha=0.8)+
   facet_grid(mutation~gfeatures,scales="free")+
@@ -689,7 +701,7 @@ fig_S8 <- ggpubr::ggboxplot(MA_u_feature, x="strain",y="mutation_rate",outlier.s
 
 
 
-ggsave(fig_S8, filename = paste( "../figures/Supp_fig8_MA_u_gf.png",sep = ""), units = "mm",height = 170, width = 175)
+ggsave(fig_S11, filename = paste( "../figures/supp_fig11_MA_u_gf.png",sep = ""), units = "mm",height = 170, width = 175)
 
 
 
