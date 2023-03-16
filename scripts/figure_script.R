@@ -158,8 +158,8 @@ fig_1 <- cowplot::plot_grid(fig_1a, fig_1b, fig_1c,
                            #    align = "v",
                            nrow = 3)
 
-ggsave(fig_1, filename = paste("../figures/FIG_1.jpg",sep = ""), units = "mm",height = 200, width = 170,dpi = 600)
-
+ 
+ggsave(fig_1, filename = paste("../figures/FIG_1.tiff",sep = ""), units = "mm",height = 200, width = 170, device='tiff', dpi=350)
 
 
 ############# Figure  2    ###############
@@ -187,8 +187,9 @@ fig_2a <- ggplot() +
   scale_y_continuous(breaks=c(-1,1,3,5),expand = c(0, 0), limits = c(-1,6))
 
 
-ggsave(fig_2a, filename = paste( "../figures/FIG_2a.jpg",sep = ""), units = "mm",height = 80, width = 170,dpi = 600)
+ 
 
+ggsave(fig_2a, filename = paste( "../figures/FIG_2a.tiff",sep = ""), units = "mm",height = 80, width = 170, device='tiff', dpi=350)
 
 
 
@@ -257,7 +258,7 @@ fig_3 <- cowplot::plot_grid(fig_3a, fig_3b,
                             axis = "l",
                             nrow = 2)
 
-ggsave(fig_3, filename = paste("../figures/FIG_3.jpg",sep = ""), units = "mm",height = 120, width = 170,dpi = 600)
+ggsave(fig_3, filename = paste("../figures/FIG_3.tiff",sep = ""), units = "mm",height = 120, width = 170, device='tiff', dpi=350)
 
 
 
@@ -355,7 +356,7 @@ fig_4 <- cowplot::plot_grid(  fig_4a,fig_4b,
                             # align = "v",
                             nrow = 2)
 
-ggsave(fig_4, filename = paste( "../figures/FIG_4.jpg",sep = ""), units = "mm",height = 150, width = 170,dpi = 600)
+ggsave(fig_4, filename = paste( "../figures/FIG_4.tiff",sep = ""), units = "mm",height = 150, width = 170, device='tiff', dpi=350)
 
 
 
@@ -404,7 +405,7 @@ fig_5 <- ggpubr::ggboxplot(data_fig_5, x="strain",y="mutation_rate",outlier.shap
   scale_x_discrete("MA lines", labels=expression(N2,PB306, italic('mev-1')))
 
 
-ggsave(fig_5, filename = paste( "../figures/FIG_5.jpg",sep = ""), units = "mm",height = 90, width = 170,dpi = 600)
+ggsave(fig_5, filename = paste( "../figures/FIG_5.tiff",sep = ""), units = "mm",height = 90, width = 170, device='tiff', dpi=350)
 
 
 ##############################################
